@@ -35,16 +35,6 @@ class FilesrvHandler:
         #    f.write(fileobj)
         return path
 
-    def _gen_path(self, meta):
-        hexs = sha1(meta.appid).update(meta.version_code).hexdigest()
-        dirs = os.path.join(*[hexs[(i-1)*2:i*2] for i in range(1, 5)])
-        try:
-            os.makedirs(dirs)
-        except:
-            pass
-        filename = "{}.{}".format(hexs[8:], meta.ext)
-        return os.path.join(self.root, dirs, filename)
-
 
 if __name__ == '__main__':
     handler = FilesrvHandler()
