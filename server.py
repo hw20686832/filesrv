@@ -19,22 +19,23 @@ class FilesrvHandler:
         return words
 
     def save(self, fileobj, meta):
-        path = self._gen_path(meta)
-        #with open(path, 'w') as f:
-        #    f.write(fileobj)
-        return path
-
-    def _gen_path(self, meta):
         hexs = sha1(meta.appid)
         hexs.update(str(meta.version_code))
         hex_code = hexs.hexdigest()
         dirs = os.path.join(*[hex_code[(i-1)*2:i*2] for i in range(1, 5)])
+
+        filename = "{}.{}".format(hex_code[8:], meta.ext)
         try:
-            os.makedirs(dirs)
+            os.makedirs(os.path.join(self.root, dirs))
         except:
             pass
-        filename = "{}.{}".format(hex_code[8:], meta.ext)
-        return os.path.join(self.root, dirs, filename)
+
+        filepath = os.path.join(dirs, filename)
+        fullpath = os.path.join(self.root, filepath)
+        with open(fullpath, 'w') as f:
+            f.write(fileobj)
+
+        return filepath
 
 
 if __name__ == '__main__':

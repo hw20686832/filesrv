@@ -31,10 +31,10 @@ def main():
     meta.appid = "com.facebook.katana"
     meta.version_code = 1
     meta.version_name = '1.23.5'
-    meta.ext = "jpg"
+    meta.ext = "apk"
 
-    #with open("/home/david/Downloads/wallpaper_l.jpg") as f:
-    print client.save("updated", meta)
+    with open("/home/david/Downloads/vShareMarket_20151120_mobvista_1.apk") as f:
+        print client.save(f.read(), meta)
 
     # Close!
     transport.close()
