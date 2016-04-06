@@ -25,14 +25,16 @@ def main():
     # Connect!
     transport.open()
 
+    print client.test("hello world!")
+
     meta = Meta()
 
     meta.appid = "com.facebook.katana"
     meta.version_code = 1
     meta.version_name = '1.23.5'
-    meta.ext = "apk"
+    meta.ext = "jpg"
 
-    with open("/home/david/Downloads/air.LecturaMusicalPractica.apk") as f:
+    with open("Downloads/wallpaper_l.jpg") as f:
         print client.save(f.read(), meta)
 
     # Close!
