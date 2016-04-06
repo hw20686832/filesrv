@@ -19,11 +19,10 @@ class FilesrvHandler:
         return words
 
     def save(self, fileobj, meta):
-        return fileobj
-        #path = self._gen_path(meta)
+        path = self._gen_path(meta)
         #with open(path, 'w') as f:
         #    f.write(fileobj)
-        #return path
+        return 'fixed'
 
     def _gen_path(self, meta):
         hexs = sha1(meta.appid).update(meta.version_code).hexdigest()
