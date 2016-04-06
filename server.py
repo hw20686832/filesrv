@@ -15,6 +15,9 @@ class FilesrvHandler:
     def __init__(self):
         self.root = "/data0/androidapk"
 
+    def test(self, words):
+        return words
+
     def save(self, fileobj, meta):
         path = self._gen_path(meta)
         with open(path, 'w') as f:
