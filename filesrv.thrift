@@ -9,5 +9,5 @@ struct Meta {
 
 service Filesrv {
    string test(1: string words),
-   string save(1: required binary fileobj, 2: required Meta meta)
+   string save(1: required string fileobj, 2: required Meta meta)
 }

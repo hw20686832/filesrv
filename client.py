@@ -34,7 +34,7 @@ def main():
     meta.version_name = '1.23.5'
     meta.ext = "jpg"
 
-    with open("Downloads/wallpaper_l.jpg") as f:
+    with open("/home/david/Downloads/wallpaper_l.jpg") as f:
         print client.save(f.read(), meta)
 
     # Close!
