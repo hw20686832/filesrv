@@ -13,7 +13,7 @@ from filesrv import Filesrv
 
 class FilesrvHandler:
     def __init__(self):
-        self.log = {}
+        self.root = "/data0/androidapk"
 
     def save(self, fileobj, meta):
         path = self._gen_path(meta)
@@ -29,7 +29,7 @@ class FilesrvHandler:
         except:
             pass
         filename = "*.*".format(hexs[8:], meta['ext'])
-        return os.path.join(dirs, filename)
+        return os.path.join(self.root, dirs, filename)
 
 
 if __name__ == '__main__':
