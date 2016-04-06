@@ -11,7 +11,7 @@ from thrift.protocol import TBinaryProtocol
 
 def main():
     # Make socket
-    transport = TSocket.TSocket('localhost', 9090)
+    transport = TSocket.TSocket('61.155.215.52', 9090)
 
     # Buffering is critical. Raw sockets are very slow
     transport = TTransport.TBufferedTransport(transport)
@@ -32,7 +32,7 @@ def main():
     meta.version_name = '1.23.5'
     meta.ext = "apk"
 
-    with open("com.facebook.katana.apk") as f:
+    with open("/home/david/Downloads/air.LecturaMusicalPractica.apk") as f:
         print client.save(f.read(), meta)
 
     # Close!
