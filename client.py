@@ -28,14 +28,13 @@ def main():
     print client.test("hello world!")
 
     meta = Meta()
-
     meta.appid = "com.facebook.katana"
     meta.version_code = 1
     meta.version_name = '1.23.5'
     meta.ext = "jpg"
 
-    with open("/home/david/Downloads/wallpaper_l.jpg") as f:
-        print client.save(f.read(), meta)
+    #with open("/home/david/Downloads/wallpaper_l.jpg") as f:
+    print client.save("updated", meta)
 
     # Close!
     transport.close()

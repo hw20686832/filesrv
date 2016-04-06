@@ -19,10 +19,11 @@ class FilesrvHandler:
         return words
 
     def save(self, fileobj, meta):
-        path = self._gen_path(meta)
+        return fileobj
+        #path = self._gen_path(meta)
         #with open(path, 'w') as f:
         #    f.write(fileobj)
-        return path
+        #return path
 
     def _gen_path(self, meta):
         hexs = sha1(meta.appid).update(meta.version_code).hexdigest()
@@ -31,7 +32,7 @@ class FilesrvHandler:
             os.makedirs(dirs)
         except:
             pass
-        filename = "*.*".format(hexs[8:], meta.ext)
+        filename = "{}.{}".format(hexs[8:], meta.ext)
         return os.path.join(self.root, dirs, filename)
 
 
