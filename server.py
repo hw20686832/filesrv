@@ -22,27 +22,30 @@ class FilesrvHandler(object):
         return words
 
     def save(self, fileobj, meta):
-        result = {}
-        root = os.path.join(self.root, meta.file_type)
-        hexs = sha1(meta.appid)
-        #hexs.update(str(meta.version_code))
-        hexs.update(self.secret_code)
-        hexs.update(meta.seq)
-        hex_code = hexs.hexdigest()
-        dirs = os.path.join(*[hex_code[(i-1)*2:i*2] for i in range(1, 5)])
-
-        filename = "{}.{}".format(hex_code[8:], meta.ext)
-        filepath = os.path.join(dirs, filename)
-        fullpath = os.path.join(root, filepath)
         try:
-            os.makedirs(fullpath)
-        except:
-            pass
-        with open(fullpath, 'w') as f:
-            f.write(fileobj)
+            result = {}
+            root = os.path.join(self.root, meta.file_type)
+            hexs = sha1(meta.appid)
+            #hexs.update(str(meta.version_code))
+            hexs.update(self.secret_code)
+            hexs.update(meta.seq)
+            hex_code = hexs.hexdigest()
+            dirs = os.path.join(*[hex_code[(i-1)*2:i*2] for i in range(1, 5)])
 
-        result["md5"] = md5(fileobj).hexdigest()
-        result["path"] = filepath
+            filename = "{}.{}".format(hex_code[8:], meta.ext)
+            filepath = os.path.join(dirs, filename)
+            fullpath = os.path.join(root, filepath)
+            try:
+                os.makedirs(fullpath)
+            except:
+                pass
+            with open(fullpath, 'w') as f:
+                f.write(fileobj)
+
+            result["md5"] = md5(fileobj).hexdigest()
+            result["path"] = filepath
+        except Exception as e:
+            result = {"error": e.message}
 
         return json.dumps(result)
 
