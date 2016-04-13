@@ -34,7 +34,7 @@ def main():
     meta.ext = "apk"
 
     with open("/home/david/Downloads/vShareMarket_20151120_mobvista_1.apk") as f:
-        print client.save2fdfs(f.read(), meta)
+        print client.save(f.read(), meta)
 
     # Close!
     transport.close()

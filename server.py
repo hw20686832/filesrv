@@ -16,7 +16,7 @@ from filesrv import Filesrv
 class FilesrvHandler(object):
     def __init__(self):
         self.secret_code = "sW$^dffGad3e3h8fh7gc~t7 `7 t"
-        self.root = "/data0/androidapk"
+        self.root = "/data1/androidapk"
 
     def test(self, words):
         return words
