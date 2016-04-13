@@ -23,7 +23,9 @@ class Meta:
    - appid
    - version_code
    - version_name
+   - file_type
    - ext
+   - seq
   """
 
   thrift_spec = (
@@ -31,14 +33,18 @@ class Meta:
     (1, TType.STRING, 'appid', None, None, ), # 1
     (2, TType.I32, 'version_code', None, None, ), # 2
     (3, TType.STRING, 'version_name', None, None, ), # 3
-    (4, TType.STRING, 'ext', None, None, ), # 4
+    (4, TType.STRING, 'file_type', None, "package", ), # 4
+    (5, TType.STRING, 'ext', None, "apk", ), # 5
+    (6, TType.I32, 'seq', None, 0, ), # 6
   )
 
-  def __init__(self, appid=None, version_code=None, version_name=None, ext=None,):
+  def __init__(self, appid=None, version_code=None, version_name=None, file_type=thrift_spec[4][4], ext=thrift_spec[5][4], seq=thrift_spec[6][4],):
     self.appid = appid
     self.version_code = version_code
     self.version_name = version_name
+    self.file_type = file_type
     self.ext = ext
+    self.seq = seq
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -66,7 +72,17 @@ class Meta:
           iprot.skip(ftype)
       elif fid == 4:
         if ftype == TType.STRING:
+          self.file_type = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.STRING:
           self.ext = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.I32:
+          self.seq = iprot.readI32();
         else:
           iprot.skip(ftype)
       else:
@@ -91,14 +107,158 @@ class Meta:
       oprot.writeFieldBegin('version_name', TType.STRING, 3)
       oprot.writeString(self.version_name)
       oprot.writeFieldEnd()
+    if self.file_type is not None:
+      oprot.writeFieldBegin('file_type', TType.STRING, 4)
+      oprot.writeString(self.file_type)
+      oprot.writeFieldEnd()
     if self.ext is not None:
-      oprot.writeFieldBegin('ext', TType.STRING, 4)
+      oprot.writeFieldBegin('ext', TType.STRING, 5)
       oprot.writeString(self.ext)
+      oprot.writeFieldEnd()
+    if self.seq is not None:
+      oprot.writeFieldBegin('seq', TType.I32, 6)
+      oprot.writeI32(self.seq)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
   def validate(self):
+    if self.appid is None:
+      raise TProtocol.TProtocolException(message='Required field appid is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class MetaResult:
+  """
+  Attributes:
+   - appid
+   - md5
+   - path
+   - size
+   - create_time
+   - update_time
+   - binary_str
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'appid', None, None, ), # 1
+    (2, TType.STRING, 'md5', None, None, ), # 2
+    (3, TType.STRING, 'path', None, None, ), # 3
+    (4, TType.I32, 'size', None, None, ), # 4
+    (5, TType.STRING, 'create_time', None, None, ), # 5
+    (6, TType.STRING, 'update_time', None, None, ), # 6
+    (7, TType.STRING, 'binary_str', None, None, ), # 7
+  )
+
+  def __init__(self, appid=None, md5=None, path=None, size=None, create_time=None, update_time=None, binary_str=None,):
+    self.appid = appid
+    self.md5 = md5
+    self.path = path
+    self.size = size
+    self.create_time = create_time
+    self.update_time = update_time
+    self.binary_str = binary_str
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.appid = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.md5 = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.STRING:
+          self.path = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.I32:
+          self.size = iprot.readI32();
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.STRING:
+          self.create_time = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.STRING:
+          self.update_time = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      elif fid == 7:
+        if ftype == TType.STRING:
+          self.binary_str = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('MetaResult')
+    if self.appid is not None:
+      oprot.writeFieldBegin('appid', TType.STRING, 1)
+      oprot.writeString(self.appid)
+      oprot.writeFieldEnd()
+    if self.md5 is not None:
+      oprot.writeFieldBegin('md5', TType.STRING, 2)
+      oprot.writeString(self.md5)
+      oprot.writeFieldEnd()
+    if self.path is not None:
+      oprot.writeFieldBegin('path', TType.STRING, 3)
+      oprot.writeString(self.path)
+      oprot.writeFieldEnd()
+    if self.size is not None:
+      oprot.writeFieldBegin('size', TType.I32, 4)
+      oprot.writeI32(self.size)
+      oprot.writeFieldEnd()
+    if self.create_time is not None:
+      oprot.writeFieldBegin('create_time', TType.STRING, 5)
+      oprot.writeString(self.create_time)
+      oprot.writeFieldEnd()
+    if self.update_time is not None:
+      oprot.writeFieldBegin('update_time', TType.STRING, 6)
+      oprot.writeString(self.update_time)
+      oprot.writeFieldEnd()
+    if self.binary_str is not None:
+      oprot.writeFieldBegin('binary_str', TType.STRING, 7)
+      oprot.writeString(self.binary_str)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.appid is None:
+      raise TProtocol.TProtocolException(message='Required field appid is unset!')
     return
 
 
