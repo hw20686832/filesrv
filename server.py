@@ -45,7 +45,7 @@ class FilesrvHandler(object):
             result["md5"] = md5(fileobj).hexdigest()
             result["path"] = filepath
         except Exception as e:
-            result = {"error": e.message}
+            result = {"error": str(e)}
 
         return json.dumps(result)
 
