@@ -28,7 +28,7 @@ class FilesrvHandler(object):
             hexs = sha1(meta.appid)
             #hexs.update(str(meta.version_code))
             hexs.update(self.secret_code)
-            hexs.update(meta.seq)
+            hexs.update(str(meta.seq))
             hex_code = hexs.hexdigest()
             dirs = os.path.join(*[hex_code[(i-1)*2:i*2] for i in range(1, 5)])
 
