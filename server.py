@@ -56,7 +56,7 @@ class FilesrvHandler(object):
             "ext": meta.ext,
             "seq": meta.seq
         }
-        rs = client.upload_by_buffer(filebuff, meta_dict)
+        rs = client.upload_by_buffer(filebuff, meta.ext, meta_dict=meta_dict)
         result = {
             "md5": md5(filebuff).hexdigest(),
             "path": rs["Remote file_id"],
