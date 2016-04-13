@@ -36,7 +36,7 @@ class FilesrvHandler(object):
             filepath = os.path.join(dirs, filename)
             fullpath = os.path.join(root, filepath)
             try:
-                os.makedirs(fullpath)
+                os.makedirs(os.path.join(root, dirs))
             except:
                 pass
             with open(fullpath, 'w') as f:
