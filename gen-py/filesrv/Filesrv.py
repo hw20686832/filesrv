@@ -41,11 +41,10 @@ class Iface:
     """
     pass
 
-  def get(self, fileid, with_binary):
+  def get(self, fileid):
     """
     Parameters:
      - fileid
-     - with_binary
     """
     pass
 
@@ -158,20 +157,18 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "save2fdfs failed: unknown result");
 
-  def get(self, fileid, with_binary):
+  def get(self, fileid):
     """
     Parameters:
      - fileid
-     - with_binary
     """
-    self.send_get(fileid, with_binary)
+    self.send_get(fileid)
     return self.recv_get()
 
-  def send_get(self, fileid, with_binary):
+  def send_get(self, fileid):
     self._oprot.writeMessageBegin('get', TMessageType.CALL, self._seqid)
     args = get_args()
     args.fileid = fileid
-    args.with_binary = with_binary
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
@@ -284,7 +281,7 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = get_result()
-    result.success = self._handler.get(args.fileid, args.with_binary)
+    result.success = self._handler.get(args.fileid)
     oprot.writeMessageBegin("get", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -699,18 +696,15 @@ class get_args:
   """
   Attributes:
    - fileid
-   - with_binary
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'fileid', None, None, ), # 1
-    (2, TType.BOOL, 'with_binary', None, None, ), # 2
   )
 
-  def __init__(self, fileid=None, with_binary=None,):
+  def __init__(self, fileid=None,):
     self.fileid = fileid
-    self.with_binary = with_binary
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -726,11 +720,6 @@ class get_args:
           self.fileid = iprot.readString();
         else:
           iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.BOOL:
-          self.with_binary = iprot.readBool();
-        else:
-          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -744,10 +733,6 @@ class get_args:
     if self.fileid is not None:
       oprot.writeFieldBegin('fileid', TType.STRING, 1)
       oprot.writeString(self.fileid)
-      oprot.writeFieldEnd()
-    if self.with_binary is not None:
-      oprot.writeFieldBegin('with_binary', TType.BOOL, 2)
-      oprot.writeBool(self.with_binary)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -776,7 +761,7 @@ class get_result:
   """
 
   thrift_spec = (
-    (0, TType.STRING, 'success', None, None, ), # 0
+    (0, TType.STRUCT, 'success', (Meta, Meta.thrift_spec), None, ), # 0
   )
 
   def __init__(self, success=None,):
@@ -792,8 +777,9 @@ class get_result:
       if ftype == TType.STOP:
         break
       if fid == 0:
-        if ftype == TType.STRING:
-          self.success = iprot.readString();
+        if ftype == TType.STRUCT:
+          self.success = Meta()
+          self.success.read(iprot)
         else:
           iprot.skip(ftype)
       else:
@@ -807,8 +793,8 @@ class get_result:
       return
     oprot.writeStructBegin('get_result')
     if self.success is not None:
-      oprot.writeFieldBegin('success', TType.STRING, 0)
-      oprot.writeString(self.success)
+      oprot.writeFieldBegin('success', TType.STRUCT, 0)
+      self.success.write(oprot)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

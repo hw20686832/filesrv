@@ -26,7 +26,7 @@ def main():
     transport.open()
 
     print client.test("hello world!")
-    print client.get("group1/M00/00/00/wKgCFFcOHb2ACJ3oACe08ejnGKc044.apk", False)
+    print client.get("group1/M00/00/00/wKgCFFcOHb2ACJ3oACe08ejnGKc044.apk")
 
     meta = Meta()
     meta.appid = "com.facebook.katana"
