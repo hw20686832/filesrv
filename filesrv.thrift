@@ -13,6 +13,6 @@ service Filesrv {
    string test(1: string words),
    string save(1: required string fileobj, 2: required Meta meta),
    string save2fdfs(1: required string filebuff, 2: required Meta meta),
-   string get(1: required string fileid, 2: bool with_binary),
+   Meta get(1: required string fileid),
    string remove(1: required string fileid)
 }

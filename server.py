@@ -11,6 +11,7 @@ from thrift.server import TServer
 from fdfs_client.client import Fdfs_client
 
 from filesrv import Filesrv
+from filesrv.ttypes import Meta
 
 
 class FilesrvHandler(object):
@@ -68,9 +69,16 @@ class FilesrvHandler(object):
 
         return json.dumps(result)
 
-    def get(self, fileid, with_binary=False):
+    def get(self, fileid):
         meta = self.client.get_meta_data(fileid)
-        return json.dumps(meta)
+        return Meta(
+            appid=meta.appid,
+            version_code=meta.version_code,
+            version_name=meta.version_name,
+            file_type=meta.file_type,
+            ext=meta.ext,
+            seq=meta.seq
+        )
 
     def remove(self, fileid):
         rs = self.client.delete_file(fileid)

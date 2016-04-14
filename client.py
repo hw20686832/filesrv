@@ -26,6 +26,7 @@ def main():
     transport.open()
 
     print client.test("hello world!")
+    print client.get("group1/M00/00/00/wKgCFFcOHb2ACJ3oACe08ejnGKc044.apk", False)
 
     meta = Meta()
     meta.appid = "com.facebook.katana"
@@ -33,8 +34,8 @@ def main():
     meta.version_name = '1.23.5'
     meta.ext = "apk"
 
-    with open("/home/david/Downloads/vShareMarket_20151120_mobvista_1.apk") as f:
-        print client.save(f.read(), meta)
+    #with open("/home/david/Downloads/vShareMarket_20151120_mobvista_1.apk") as f:
+    #    print client.save(f.read(), meta)
 
     # Close!
     transport.close()
