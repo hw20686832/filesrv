@@ -74,11 +74,11 @@ class FilesrvHandler(object):
             meta = self.client.get_meta_data(fileid)
             return Meta(
                 appid=meta['appid'],
-                version_code=meta['version_code'],
+                version_code=int(meta['version_code']),
                 version_name=meta['version_name'],
                 file_type=meta['file_type'],
                 ext=meta['ext'],
-                seq=meta['seq']
+                seq=int(meta['seq'])
             )
         except Exception as e:
             return str(e)
