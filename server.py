@@ -17,6 +17,7 @@ class FilesrvHandler(object):
     def __init__(self):
         self.secret_code = "sW$^dffGad3e3h8fh7gc~t7 `7 t"
         self.root = "/data1/androidapk"
+        self.client = Fdfs_client('/etc/fdfs/client.conf')
 
     def test(self, words):
         return words
@@ -50,7 +51,6 @@ class FilesrvHandler(object):
         return json.dumps(result)
 
     def save2fdfs(self, filebuff, meta):
-        client = Fdfs_client('/etc/fdfs/client.conf')
         meta_dict = {
             "appid": meta.appid,
             "version_code": meta.version_code,
@@ -59,7 +59,7 @@ class FilesrvHandler(object):
             "ext": meta.ext,
             "seq": meta.seq
         }
-        rs = client.upload_by_buffer(filebuff, meta.ext, meta_dict=meta_dict)
+        rs = self.client.upload_by_buffer(filebuff, meta.ext, meta_dict=meta_dict)
         result = {
             "md5": md5(filebuff).hexdigest(),
             "path": rs["Remote file_id"],
@@ -68,8 +68,13 @@ class FilesrvHandler(object):
 
         return json.dumps(result)
 
-    def get(meta, with_binary=False):
-        return ""
+    def get(self, fileid, with_binary=False):
+        meta = self.client.get_meta_data(fileid)
+        return json.dumps(meta)
+
+    def remove(self, fileid):
+        rs = self.client.delete_file(fileid)
+        return json.dumps({'appid': rs[1]})
 
 
 if __name__ == '__main__':

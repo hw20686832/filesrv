@@ -26,7 +26,8 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print '  string test(string words)'
   print '  string save(string fileobj, Meta meta)'
   print '  string save2fdfs(string filebuff, Meta meta)'
-  print '  MetaResult get(Meta meta, bool with_binary)'
+  print '  string get(string fileid, bool with_binary)'
+  print '  string remove(string fileid)'
   print ''
   sys.exit(0)
 
@@ -100,7 +101,13 @@ elif cmd == 'get':
   if len(args) != 2:
     print 'get requires 2 args'
     sys.exit(1)
-  pp.pprint(client.get(eval(args[0]),eval(args[1]),))
+  pp.pprint(client.get(args[0],eval(args[1]),))
+
+elif cmd == 'remove':
+  if len(args) != 1:
+    print 'remove requires 1 args'
+    sys.exit(1)
+  pp.pprint(client.remove(args[0],))
 
 else:
   print 'Unrecognized method %s' % cmd

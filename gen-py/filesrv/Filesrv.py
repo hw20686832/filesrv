@@ -41,11 +41,18 @@ class Iface:
     """
     pass
 
-  def get(self, meta, with_binary):
+  def get(self, fileid, with_binary):
     """
     Parameters:
-     - meta
+     - fileid
      - with_binary
+    """
+    pass
+
+  def remove(self, fileid):
+    """
+    Parameters:
+     - fileid
     """
     pass
 
@@ -151,19 +158,19 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "save2fdfs failed: unknown result");
 
-  def get(self, meta, with_binary):
+  def get(self, fileid, with_binary):
     """
     Parameters:
-     - meta
+     - fileid
      - with_binary
     """
-    self.send_get(meta, with_binary)
+    self.send_get(fileid, with_binary)
     return self.recv_get()
 
-  def send_get(self, meta, with_binary):
+  def send_get(self, fileid, with_binary):
     self._oprot.writeMessageBegin('get', TMessageType.CALL, self._seqid)
     args = get_args()
-    args.meta = meta
+    args.fileid = fileid
     args.with_binary = with_binary
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
@@ -183,6 +190,36 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "get failed: unknown result");
 
+  def remove(self, fileid):
+    """
+    Parameters:
+     - fileid
+    """
+    self.send_remove(fileid)
+    return self.recv_remove()
+
+  def send_remove(self, fileid):
+    self._oprot.writeMessageBegin('remove', TMessageType.CALL, self._seqid)
+    args = remove_args()
+    args.fileid = fileid
+    args.write(self._oprot)
+    self._oprot.writeMessageEnd()
+    self._oprot.trans.flush()
+
+  def recv_remove(self):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = remove_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "remove failed: unknown result");
+
 
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
@@ -192,6 +229,7 @@ class Processor(Iface, TProcessor):
     self._processMap["save"] = Processor.process_save
     self._processMap["save2fdfs"] = Processor.process_save2fdfs
     self._processMap["get"] = Processor.process_get
+    self._processMap["remove"] = Processor.process_remove
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
@@ -246,8 +284,19 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = get_result()
-    result.success = self._handler.get(args.meta, args.with_binary)
+    result.success = self._handler.get(args.fileid, args.with_binary)
     oprot.writeMessageBegin("get", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
+
+  def process_remove(self, seqid, iprot, oprot):
+    args = remove_args()
+    args.read(iprot)
+    iprot.readMessageEnd()
+    result = remove_result()
+    result.success = self._handler.remove(args.fileid)
+    oprot.writeMessageBegin("remove", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -649,18 +698,18 @@ class save2fdfs_result:
 class get_args:
   """
   Attributes:
-   - meta
+   - fileid
    - with_binary
   """
 
   thrift_spec = (
     None, # 0
-    (1, TType.STRUCT, 'meta', (Meta, Meta.thrift_spec), None, ), # 1
+    (1, TType.STRING, 'fileid', None, None, ), # 1
     (2, TType.BOOL, 'with_binary', None, None, ), # 2
   )
 
-  def __init__(self, meta=None, with_binary=None,):
-    self.meta = meta
+  def __init__(self, fileid=None, with_binary=None,):
+    self.fileid = fileid
     self.with_binary = with_binary
 
   def read(self, iprot):
@@ -673,9 +722,8 @@ class get_args:
       if ftype == TType.STOP:
         break
       if fid == 1:
-        if ftype == TType.STRUCT:
-          self.meta = Meta()
-          self.meta.read(iprot)
+        if ftype == TType.STRING:
+          self.fileid = iprot.readString();
         else:
           iprot.skip(ftype)
       elif fid == 2:
@@ -693,9 +741,9 @@ class get_args:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('get_args')
-    if self.meta is not None:
-      oprot.writeFieldBegin('meta', TType.STRUCT, 1)
-      self.meta.write(oprot)
+    if self.fileid is not None:
+      oprot.writeFieldBegin('fileid', TType.STRING, 1)
+      oprot.writeString(self.fileid)
       oprot.writeFieldEnd()
     if self.with_binary is not None:
       oprot.writeFieldBegin('with_binary', TType.BOOL, 2)
@@ -705,8 +753,8 @@ class get_args:
     oprot.writeStructEnd()
 
   def validate(self):
-    if self.meta is None:
-      raise TProtocol.TProtocolException(message='Required field meta is unset!')
+    if self.fileid is None:
+      raise TProtocol.TProtocolException(message='Required field fileid is unset!')
     return
 
 
@@ -728,7 +776,7 @@ class get_result:
   """
 
   thrift_spec = (
-    (0, TType.STRUCT, 'success', (MetaResult, MetaResult.thrift_spec), None, ), # 0
+    (0, TType.STRING, 'success', None, None, ), # 0
   )
 
   def __init__(self, success=None,):
@@ -744,9 +792,8 @@ class get_result:
       if ftype == TType.STOP:
         break
       if fid == 0:
-        if ftype == TType.STRUCT:
-          self.success = MetaResult()
-          self.success.read(iprot)
+        if ftype == TType.STRING:
+          self.success = iprot.readString();
         else:
           iprot.skip(ftype)
       else:
@@ -760,8 +807,129 @@ class get_result:
       return
     oprot.writeStructBegin('get_result')
     if self.success is not None:
-      oprot.writeFieldBegin('success', TType.STRUCT, 0)
-      self.success.write(oprot)
+      oprot.writeFieldBegin('success', TType.STRING, 0)
+      oprot.writeString(self.success)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class remove_args:
+  """
+  Attributes:
+   - fileid
+  """
+
+  thrift_spec = (
+    None, # 0
+    (1, TType.STRING, 'fileid', None, None, ), # 1
+  )
+
+  def __init__(self, fileid=None,):
+    self.fileid = fileid
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 1:
+        if ftype == TType.STRING:
+          self.fileid = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('remove_args')
+    if self.fileid is not None:
+      oprot.writeFieldBegin('fileid', TType.STRING, 1)
+      oprot.writeString(self.fileid)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    if self.fileid is None:
+      raise TProtocol.TProtocolException(message='Required field fileid is unset!')
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class remove_result:
+  """
+  Attributes:
+   - success
+  """
+
+  thrift_spec = (
+    (0, TType.STRING, 'success', None, None, ), # 0
+  )
+
+  def __init__(self, success=None,):
+    self.success = success
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRING:
+          self.success = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('remove_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRING, 0)
+      oprot.writeString(self.success)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
