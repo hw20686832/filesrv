@@ -69,6 +69,16 @@ class FilesrvHandler(object):
 
         return json.dumps(result)
 
+    def save_media(self, filebuff, ext):
+        rs = self.client.upload_by_buffer(filebuff, ext)
+        result = {
+            "md5": md5(filebuff).hexdigest(),
+            "path": rs["Remote file_id"],
+            "size": rs["Uploaded size"]
+        }
+
+        return json.dumps(result)
+
     def get(self, fileid):
         try:
             meta = self.client.get_meta_data(fileid)

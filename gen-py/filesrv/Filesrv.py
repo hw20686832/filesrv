@@ -25,15 +25,7 @@ class Iface:
     """
     pass
 
-  def save(self, fileobj, meta):
-    """
-    Parameters:
-     - fileobj
-     - meta
-    """
-    pass
-
-  def save2fdfs(self, filebuff, meta):
+  def save(self, filebuff, meta):
     """
     Parameters:
      - filebuff
@@ -41,10 +33,18 @@ class Iface:
     """
     pass
 
-  def get(self, fileid):
+  def save_media(self, filebuff):
+    """
+    Parameters:
+     - filebuff
+    """
+    pass
+
+  def get(self, fileid, ext):
     """
     Parameters:
      - fileid
+     - ext
     """
     pass
 
@@ -93,19 +93,19 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "test failed: unknown result");
 
-  def save(self, fileobj, meta):
+  def save(self, filebuff, meta):
     """
     Parameters:
-     - fileobj
+     - filebuff
      - meta
     """
-    self.send_save(fileobj, meta)
+    self.send_save(filebuff, meta)
     return self.recv_save()
 
-  def send_save(self, fileobj, meta):
+  def send_save(self, filebuff, meta):
     self._oprot.writeMessageBegin('save', TMessageType.CALL, self._seqid)
     args = save_args()
-    args.fileobj = fileobj
+    args.filebuff = filebuff
     args.meta = meta
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
@@ -125,50 +125,50 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "save failed: unknown result");
 
-  def save2fdfs(self, filebuff, meta):
+  def save_media(self, filebuff):
     """
     Parameters:
      - filebuff
-     - meta
     """
-    self.send_save2fdfs(filebuff, meta)
-    return self.recv_save2fdfs()
+    self.send_save_media(filebuff)
+    return self.recv_save_media()
 
-  def send_save2fdfs(self, filebuff, meta):
-    self._oprot.writeMessageBegin('save2fdfs', TMessageType.CALL, self._seqid)
-    args = save2fdfs_args()
+  def send_save_media(self, filebuff):
+    self._oprot.writeMessageBegin('save_media', TMessageType.CALL, self._seqid)
+    args = save_media_args()
     args.filebuff = filebuff
-    args.meta = meta
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
 
-  def recv_save2fdfs(self):
+  def recv_save_media(self):
     (fname, mtype, rseqid) = self._iprot.readMessageBegin()
     if mtype == TMessageType.EXCEPTION:
       x = TApplicationException()
       x.read(self._iprot)
       self._iprot.readMessageEnd()
       raise x
-    result = save2fdfs_result()
+    result = save_media_result()
     result.read(self._iprot)
     self._iprot.readMessageEnd()
     if result.success is not None:
       return result.success
-    raise TApplicationException(TApplicationException.MISSING_RESULT, "save2fdfs failed: unknown result");
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "save_media failed: unknown result");
 
-  def get(self, fileid):
+  def get(self, fileid, ext):
     """
     Parameters:
      - fileid
+     - ext
     """
-    self.send_get(fileid)
+    self.send_get(fileid, ext)
     return self.recv_get()
 
-  def send_get(self, fileid):
+  def send_get(self, fileid, ext):
     self._oprot.writeMessageBegin('get', TMessageType.CALL, self._seqid)
     args = get_args()
     args.fileid = fileid
+    args.ext = ext
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
@@ -224,7 +224,7 @@ class Processor(Iface, TProcessor):
     self._processMap = {}
     self._processMap["test"] = Processor.process_test
     self._processMap["save"] = Processor.process_save
-    self._processMap["save2fdfs"] = Processor.process_save2fdfs
+    self._processMap["save_media"] = Processor.process_save_media
     self._processMap["get"] = Processor.process_get
     self._processMap["remove"] = Processor.process_remove
 
@@ -259,19 +259,19 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = save_result()
-    result.success = self._handler.save(args.fileobj, args.meta)
+    result.success = self._handler.save(args.filebuff, args.meta)
     oprot.writeMessageBegin("save", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
 
-  def process_save2fdfs(self, seqid, iprot, oprot):
-    args = save2fdfs_args()
+  def process_save_media(self, seqid, iprot, oprot):
+    args = save_media_args()
     args.read(iprot)
     iprot.readMessageEnd()
-    result = save2fdfs_result()
-    result.success = self._handler.save2fdfs(args.filebuff, args.meta)
-    oprot.writeMessageBegin("save2fdfs", TMessageType.REPLY, seqid)
+    result = save_media_result()
+    result.success = self._handler.save_media(args.filebuff)
+    oprot.writeMessageBegin("save_media", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
     oprot.trans.flush()
@@ -281,7 +281,7 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = get_result()
-    result.success = self._handler.get(args.fileid)
+    result.success = self._handler.get(args.fileid, args.ext)
     oprot.writeMessageBegin("get", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -423,18 +423,18 @@ class test_result:
 class save_args:
   """
   Attributes:
-   - fileobj
+   - filebuff
    - meta
   """
 
   thrift_spec = (
     None, # 0
-    (1, TType.STRING, 'fileobj', None, None, ), # 1
+    (1, TType.STRING, 'filebuff', None, None, ), # 1
     (2, TType.STRUCT, 'meta', (Meta, Meta.thrift_spec), None, ), # 2
   )
 
-  def __init__(self, fileobj=None, meta=None,):
-    self.fileobj = fileobj
+  def __init__(self, filebuff=None, meta=None,):
+    self.filebuff = filebuff
     self.meta = meta
 
   def read(self, iprot):
@@ -448,7 +448,7 @@ class save_args:
         break
       if fid == 1:
         if ftype == TType.STRING:
-          self.fileobj = iprot.readString();
+          self.filebuff = iprot.readString();
         else:
           iprot.skip(ftype)
       elif fid == 2:
@@ -467,9 +467,9 @@ class save_args:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('save_args')
-    if self.fileobj is not None:
-      oprot.writeFieldBegin('fileobj', TType.STRING, 1)
-      oprot.writeString(self.fileobj)
+    if self.filebuff is not None:
+      oprot.writeFieldBegin('filebuff', TType.STRING, 1)
+      oprot.writeString(self.filebuff)
       oprot.writeFieldEnd()
     if self.meta is not None:
       oprot.writeFieldBegin('meta', TType.STRUCT, 2)
@@ -479,8 +479,8 @@ class save_args:
     oprot.writeStructEnd()
 
   def validate(self):
-    if self.fileobj is None:
-      raise TProtocol.TProtocolException(message='Required field fileobj is unset!')
+    if self.filebuff is None:
+      raise TProtocol.TProtocolException(message='Required field filebuff is unset!')
     if self.meta is None:
       raise TProtocol.TProtocolException(message='Required field meta is unset!')
     return
@@ -556,22 +556,19 @@ class save_result:
   def __ne__(self, other):
     return not (self == other)
 
-class save2fdfs_args:
+class save_media_args:
   """
   Attributes:
    - filebuff
-   - meta
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'filebuff', None, None, ), # 1
-    (2, TType.STRUCT, 'meta', (Meta, Meta.thrift_spec), None, ), # 2
   )
 
-  def __init__(self, filebuff=None, meta=None,):
+  def __init__(self, filebuff=None,):
     self.filebuff = filebuff
-    self.meta = meta
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -587,12 +584,6 @@ class save2fdfs_args:
           self.filebuff = iprot.readString();
         else:
           iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRUCT:
-          self.meta = Meta()
-          self.meta.read(iprot)
-        else:
-          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -602,14 +593,10 @@ class save2fdfs_args:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('save2fdfs_args')
+    oprot.writeStructBegin('save_media_args')
     if self.filebuff is not None:
       oprot.writeFieldBegin('filebuff', TType.STRING, 1)
       oprot.writeString(self.filebuff)
-      oprot.writeFieldEnd()
-    if self.meta is not None:
-      oprot.writeFieldBegin('meta', TType.STRUCT, 2)
-      self.meta.write(oprot)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -617,8 +604,6 @@ class save2fdfs_args:
   def validate(self):
     if self.filebuff is None:
       raise TProtocol.TProtocolException(message='Required field filebuff is unset!')
-    if self.meta is None:
-      raise TProtocol.TProtocolException(message='Required field meta is unset!')
     return
 
 
@@ -633,7 +618,7 @@ class save2fdfs_args:
   def __ne__(self, other):
     return not (self == other)
 
-class save2fdfs_result:
+class save_media_result:
   """
   Attributes:
    - success
@@ -669,7 +654,7 @@ class save2fdfs_result:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('save2fdfs_result')
+    oprot.writeStructBegin('save_media_result')
     if self.success is not None:
       oprot.writeFieldBegin('success', TType.STRING, 0)
       oprot.writeString(self.success)
@@ -696,15 +681,18 @@ class get_args:
   """
   Attributes:
    - fileid
+   - ext
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'fileid', None, None, ), # 1
+    (2, TType.STRING, 'ext', None, None, ), # 2
   )
 
-  def __init__(self, fileid=None,):
+  def __init__(self, fileid=None, ext=None,):
     self.fileid = fileid
+    self.ext = ext
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -720,6 +708,11 @@ class get_args:
           self.fileid = iprot.readString();
         else:
           iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.ext = iprot.readString();
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -733,6 +726,10 @@ class get_args:
     if self.fileid is not None:
       oprot.writeFieldBegin('fileid', TType.STRING, 1)
       oprot.writeString(self.fileid)
+      oprot.writeFieldEnd()
+    if self.ext is not None:
+      oprot.writeFieldBegin('ext', TType.STRING, 2)
+      oprot.writeString(self.ext)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
