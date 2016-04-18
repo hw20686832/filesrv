@@ -105,11 +105,11 @@ if __name__ == '__main__':
     tfactory = TTransport.TBufferedTransportFactory()
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
 
-    server = TServer.TSimpleServer(processor, transport, tfactory, pfactory)
+    #server = TServer.TSimpleServer(processor, transport, tfactory, pfactory)
 
     # You could do one of these for a multithreaded server
     # server = TServer.TThreadedServer(processor, transport, tfactory, pfactory)
-    # server = TServer.TThreadPoolServer(processor, transport, tfactory, pfactory)
+    server = TServer.TThreadPoolServer(processor, transport, tfactory, pfactory)
 
     print('Starting the server...')
     server.serve()
