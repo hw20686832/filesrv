@@ -12,7 +12,7 @@ struct Meta {
 service Filesrv {
    string test(1: string words),
    string save(1: required string filebuff, 2: required Meta meta),
-   string save_media(1: required string filebuff),
-   Meta get(1: required string fileid, 2: string ext),
+   string save_media(1: required string filebuff, 2: string ext),
+   Meta get(1: required string fileid),
    string remove(1: required string fileid)
 }

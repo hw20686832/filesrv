@@ -33,18 +33,18 @@ class Iface:
     """
     pass
 
-  def save_media(self, filebuff):
+  def save_media(self, filebuff, ext):
     """
     Parameters:
      - filebuff
+     - ext
     """
     pass
 
-  def get(self, fileid, ext):
+  def get(self, fileid):
     """
     Parameters:
      - fileid
-     - ext
     """
     pass
 
@@ -125,18 +125,20 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "save failed: unknown result");
 
-  def save_media(self, filebuff):
+  def save_media(self, filebuff, ext):
     """
     Parameters:
      - filebuff
+     - ext
     """
-    self.send_save_media(filebuff)
+    self.send_save_media(filebuff, ext)
     return self.recv_save_media()
 
-  def send_save_media(self, filebuff):
+  def send_save_media(self, filebuff, ext):
     self._oprot.writeMessageBegin('save_media', TMessageType.CALL, self._seqid)
     args = save_media_args()
     args.filebuff = filebuff
+    args.ext = ext
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
@@ -155,20 +157,18 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "save_media failed: unknown result");
 
-  def get(self, fileid, ext):
+  def get(self, fileid):
     """
     Parameters:
      - fileid
-     - ext
     """
-    self.send_get(fileid, ext)
+    self.send_get(fileid)
     return self.recv_get()
 
-  def send_get(self, fileid, ext):
+  def send_get(self, fileid):
     self._oprot.writeMessageBegin('get', TMessageType.CALL, self._seqid)
     args = get_args()
     args.fileid = fileid
-    args.ext = ext
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
@@ -270,7 +270,7 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = save_media_result()
-    result.success = self._handler.save_media(args.filebuff)
+    result.success = self._handler.save_media(args.filebuff, args.ext)
     oprot.writeMessageBegin("save_media", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -281,7 +281,7 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = get_result()
-    result.success = self._handler.get(args.fileid, args.ext)
+    result.success = self._handler.get(args.fileid)
     oprot.writeMessageBegin("get", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -560,15 +560,18 @@ class save_media_args:
   """
   Attributes:
    - filebuff
+   - ext
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'filebuff', None, None, ), # 1
+    (2, TType.STRING, 'ext', None, None, ), # 2
   )
 
-  def __init__(self, filebuff=None,):
+  def __init__(self, filebuff=None, ext=None,):
     self.filebuff = filebuff
+    self.ext = ext
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -584,6 +587,11 @@ class save_media_args:
           self.filebuff = iprot.readString();
         else:
           iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.ext = iprot.readString();
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -597,6 +605,10 @@ class save_media_args:
     if self.filebuff is not None:
       oprot.writeFieldBegin('filebuff', TType.STRING, 1)
       oprot.writeString(self.filebuff)
+      oprot.writeFieldEnd()
+    if self.ext is not None:
+      oprot.writeFieldBegin('ext', TType.STRING, 2)
+      oprot.writeString(self.ext)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -681,18 +693,15 @@ class get_args:
   """
   Attributes:
    - fileid
-   - ext
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'fileid', None, None, ), # 1
-    (2, TType.STRING, 'ext', None, None, ), # 2
   )
 
-  def __init__(self, fileid=None, ext=None,):
+  def __init__(self, fileid=None,):
     self.fileid = fileid
-    self.ext = ext
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -708,11 +717,6 @@ class get_args:
           self.fileid = iprot.readString();
         else:
           iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRING:
-          self.ext = iprot.readString();
-        else:
-          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -726,10 +730,6 @@ class get_args:
     if self.fileid is not None:
       oprot.writeFieldBegin('fileid', TType.STRING, 1)
       oprot.writeString(self.fileid)
-      oprot.writeFieldEnd()
-    if self.ext is not None:
-      oprot.writeFieldBegin('ext', TType.STRING, 2)
-      oprot.writeString(self.ext)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

@@ -23,7 +23,7 @@ class FilesrvHandler(object):
     def test(self, words):
         return words
 
-    def save(self, fileobj, meta):
+    def save2fs(self, fileobj, meta):
         try:
             result = {}
             root = os.path.join(self.root, meta.file_type)
@@ -51,7 +51,7 @@ class FilesrvHandler(object):
 
         return json.dumps(result)
 
-    def save2fdfs(self, filebuff, meta):
+    def save(self, filebuff, meta):
         meta_dict = {
             "appid": meta.appid,
             "version_code": meta.version_code,
