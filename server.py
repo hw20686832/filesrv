@@ -17,7 +17,7 @@ from filesrv.ttypes import Meta
 class FilesrvHandler(object):
     def __init__(self):
         self.secret_code = "sW$^dffGad3e3h8fh7gc~t7 `7 t"
-        self.root = "/data1/androidapk"
+        self.root = "/data0/androidapk"
         self.client = Fdfs_client('/etc/fdfs/client.conf')
 
     def test(self, words):
