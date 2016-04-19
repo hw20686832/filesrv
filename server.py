@@ -17,7 +17,7 @@ from filesrv.ttypes import Meta
 class FilesrvHandler(object):
     def __init__(self):
         self.secret_code = "sW$^dffGad3e3h8fh7gc~t7 `7 t"
-        self.root = "/data0/androidapk"
+        self.root = "/data0/androidapk/"
         self.client = Fdfs_client('/etc/fdfs/client.conf')
 
     def test(self, words):
@@ -26,19 +26,18 @@ class FilesrvHandler(object):
     def save(self, fileobj, meta):
         try:
             result = {}
-            root = os.path.join(self.root, meta.file_type)
             hexs = sha1(meta.appid)
             #hexs.update(str(meta.version_code))
             hexs.update(self.secret_code)
             hexs.update(str(meta.seq))
             hex_code = hexs.hexdigest()
-            dirs = os.path.join(*[hex_code[(i-1)*2:i*2] for i in range(1, 5)])
+            dirs = os.path.join(meta.file_type, *[hex_code[(i-1)*2:i*2] for i in range(1, 5)])
 
             filename = "{}.{}".format(hex_code[8:], meta.ext)
             filepath = os.path.join(dirs, filename)
-            fullpath = os.path.join(root, filepath)
+            fullpath = os.path.join(self.root, filepath)
             try:
-                os.makedirs(os.path.join(root, dirs))
+                os.makedirs(os.path.join(self.root, dirs))
             except:
                 pass
             with open(fullpath, 'w') as f:
