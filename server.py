@@ -23,7 +23,7 @@ class FilesrvHandler(object):
     def test(self, words):
         return words
 
-    def save2fs(self, fileobj, meta):
+    def save(self, fileobj, meta):
         try:
             result = {}
             root = os.path.join(self.root, meta.file_type)
@@ -51,7 +51,7 @@ class FilesrvHandler(object):
 
         return json.dumps(result)
 
-    def save(self, filebuff, meta):
+    def save2fdfs(self, filebuff, meta):
         meta_dict = {
             "appid": meta.appid,
             "version_code": meta.version_code,
@@ -69,7 +69,7 @@ class FilesrvHandler(object):
 
         return json.dumps(result)
 
-    def save_media(self, filebuff, ext):
+    def save_media2fdfs(self, filebuff, ext):
         rs = self.client.upload_by_buffer(filebuff, ext)
         result = {
             "md5": md5(filebuff).hexdigest(),
@@ -78,6 +78,15 @@ class FilesrvHandler(object):
         }
 
         return json.dumps(result)
+
+    def save_media(self, filebuff, ext):
+        meta = Meta(
+            appid="appvv.com",
+            file_type="media",
+            ext=ext
+        )
+        return self.save(filebuff, meta)
+
 
     def get(self, fileid):
         try:
