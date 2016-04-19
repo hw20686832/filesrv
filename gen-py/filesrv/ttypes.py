@@ -31,14 +31,14 @@ class Meta:
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'appid', None, None, ), # 1
-    (2, TType.I32, 'version_code', None, None, ), # 2
-    (3, TType.STRING, 'version_name', None, None, ), # 3
+    (2, TType.I32, 'version_code', None, 0, ), # 2
+    (3, TType.STRING, 'version_name', None, "", ), # 3
     (4, TType.STRING, 'file_type', None, "package", ), # 4
     (5, TType.STRING, 'ext', None, "apk", ), # 5
     (6, TType.I32, 'seq', None, 0, ), # 6
   )
 
-  def __init__(self, appid=None, version_code=None, version_name=None, file_type=thrift_spec[4][4], ext=thrift_spec[5][4], seq=thrift_spec[6][4],):
+  def __init__(self, appid=None, version_code=thrift_spec[2][4], version_name=thrift_spec[3][4], file_type=thrift_spec[4][4], ext=thrift_spec[5][4], seq=thrift_spec[6][4],):
     self.appid = appid
     self.version_code = version_code
     self.version_name = version_name

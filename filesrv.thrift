@@ -2,8 +2,8 @@ namespace py filesrv
 
 struct Meta {
   1: required string appid,
-  2: i32 version_code,
-  3: string version_name,
+  2: i32 version_code = 0,
+  3: string version_name = '',
   4: string file_type = 'package',
   5: string ext = 'apk',
   6: i32 seq = 0
