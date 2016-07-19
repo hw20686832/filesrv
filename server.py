@@ -78,15 +78,6 @@ class FilesrvHandler(object):
 
         return json.dumps(result)
 
-    def save_media(self, filebuff, ext):
-        meta = Meta(
-            appid="appvv.com",
-            file_type="media",
-            ext=ext
-        )
-        return self.save(filebuff, meta)
-
-
     def get(self, fileid):
         try:
             meta = self.client.get_meta_data(fileid)
@@ -102,8 +93,8 @@ class FilesrvHandler(object):
             return str(e)
 
     def remove(self, fileid):
-        rs = self.client.delete_file(fileid)
-        return json.dumps({'appid': rs[1]})
+        os.remove(os.path.join(self.root, fileid))
+        return json.dumps({'appid': fileid})
 
 
 if __name__ == '__main__':
